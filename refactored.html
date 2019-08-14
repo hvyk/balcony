@@ -45,25 +45,116 @@
       // const PADDING = 70; // mm
 
       // planter dimensions
-      var PLANTER_WIDTH = 300;
+      var PLANTER_WIDTH = 160;
       var PLANTER_LENGTH = 800;
 
 
-      // // The class for corners in the rail
-      class Corner {
+      // // // The class for corners in the rail
+      // class Corner {
 
-        fill = 'white';
+      //   fill = 'white';
+      //   stroke = 'black';
+      //   strokeWidth = 1;
+
+      //   constructor(x, y, width) {
+      //     this.x = x;
+      //     this.y = y;
+      //     this.width = width;
+
+      //     // Return this, not this.shape
+      //     return this.toShape();
+      //   }
+
+      //   toShape() {
+      //     let shape = new Konva.Rect({
+      //       x: this.x,
+      //       y: this.y,
+      //       width: this.width,
+      //       height: this.width,
+      //       fill: this.fill,
+      //       stroke: this.stroke,
+      //       strokeWidth: this.strokeWidth
+      //     });
+      //     return shape;
+      //   }
+      // }
+
+      class Planter {
+
+        isSelected = false;
+
+        fill = '#a3c2c2';
+        stroke = 'black';
+        strokeWidth = 1;
+        hover = true;
+
+        constructor(railing) {
+
+          this.railingId = railing.shape._id;
+
+          if (railing.position === 'top') {
+            this.x = railing.centreX-PLANTER_LENGTH/2;
+            this.y = railing.centreY-railing.height/2-PLANTER_WIDTH;
+            this.width = PLANTER_LENGTH;
+            this.height = PLANTER_WIDTH;
+          } else if (railing.position === 'bottom') {
+            this.x = railing.centreX-PLANTER_LENGTH/2;
+            this.y = railing.centreY+railing.height/2;
+            this.width = PLANTER_LENGTH;
+            this.height = PLANTER_WIDTH;
+          } else if (railing.position === 'left') {
+            this.x = railing.centreX-PLANTER_WIDTH-railing.width/2;
+            this.y = railing.centreY-PLANTER_LENGTH/2;
+            this.width = PLANTER_WIDTH;
+            this.height = PLANTER_LENGTH;
+          } else if (railing.position === 'right') {
+            this.x = railing.centreX+railing.width/2;
+            this.y = railing.centreY-PLANTER_LENGTH/2;
+            this.width = PLANTER_WIDTH;
+            this.height = PLANTER_LENGTH;
+          }
+
+          this.createShape();
+        }
+        createShape() {
+          this.shape = new Konva.Rect({
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height,
+            fill: this.fill,
+            stroke: this.stroke,
+            strokeWidth: this.strokeWidth
+          });
+          // TODO: onclick
+          this.shape.on('click', function() {
+            console.log('Planter.click');
+            canvas.eventSelectPlanter(this);
+          })
+          this.shape.on('mouseenter', function() {
+            canvas.eventHoverPlanter(this);
+          })
+          this.shape.on('mouseleave', function() {
+            canvas.eventLeavePlanter(this);
+          })
+        }
+        toShape() {
+          return this.shape;
+        }
+      }
+
+      class Privacy {
+
+        fill = '#73264d';
         stroke = 'black';
         strokeWidth = 1;
 
-        constructor(x, y, width) {
+        constructor(x, y, width, height) {
           this.x = x;
           this.y = y;
           this.width = width;
-
-          return this.toShape();
+          this.height = height;
         }
-
         toShape() {
           let shape = new Konva.Rect({
             x: this.x,
@@ -79,41 +170,80 @@
       }
 
 
-      // Container class for Konva Shapes
-      class Frame {
+      class Corner extends Konva.Rect {
 
-        fill = '#EAEAEA';
+        constructor(x, y, width) {
+          // Konva.Rect
+          super({
+            x: x,
+            y: y,
+            width: width,
+            height: width,
+            fill: 'white',
+            stroke: 'black',
+            strokeWidth: 1
+          });
+        }
+
+        testFunction(arg) {
+          console.log('testFunction: ', arg);
+        }
+      }
+
+      // Container class for Konva Shapes
+      class Railing {
+
+        frameFill = '#EAEAEA';
         stroke = 'black';
         strokeWidth = 1;
 
-        constructor(x, y, width, height) {
+        hasPlanter = false;
+
+        planterFill = '#73264d';
+        planterStroke = 'black';
+
+        constructor(canvas, x, y, width, height, position) {
+          this.canvas = canvas;
+          
           this.x = x;
           this.y = y;
           this.width = width;
           this.height = height;
+          this.position = position;
 
-          return this.toShape();
+          this.centreX = x + width/2;
+          this.centreY = y + height/2;
+
+          this.createShape();
         }
 
-        toShape() {
-          let shape = new Konva.Rect({
+        // TODO: turn this into a group - which includes the rail, planter, privacy
+        createShape() {
+          this.shape = new Konva.Rect({
             x: this.x,
             y: this.y,
             width: this.width,
             height: this.height,
-            fill: this.fill,
+            fill: this.frameFill,
             stroke: this.stroke,
             strokeWidth: this.strokeWidth
           });
-          shape.on('mouseover', function() {
-              console.log(`left Section Mouseover`);
+          this.shape.on('mouseenter', function() {
+            console.log('Frame.mouseover');
+            canvas.eventMouseoverRailing(this);
           });
-          return shape;
+          this.shape.on('mouseleave', function() {
+            console.log('Frame.leave');
+            canvas.eventMouseoffRailing(this);
+          });
+          // return shape;
         }
 
+        toShape() {
+          return this.shape;
+        }
 
       }
-
 
       class Canvas {
 
@@ -124,24 +254,13 @@
         windowHeight;
         balconyWidth;
         balconyHeight;
-        // stage;
-        // layer;
-        // widthInput;
-        // heightInput;
 
-        /**
-         * Constructor
-         *    Creates the stage and a layer, and adds the layer to the stage
-         *    Add all the event listeners for the controls
-         *    Renders the image
-         */
         constructor() {
 
           // Canvas dimensions
           this.getWindowDimensions();
           // Get the balcony dimensions
           this.getBalconyDimensions();
-
 
           // Create the stage
           this.stage = new Konva.Stage({
@@ -159,11 +278,11 @@
           this.corners = [];
 
           // Railings 
-          this.frames = []
+          this.railings = []
           // Planters
-          this.planters = [];
+          this.planters = {}; // id: Planter (Konva.Rect)
 
-          // this.draw();
+          this.isInitialized = false;
         }
 
         getWindowDimensions() {
@@ -182,7 +301,45 @@
         }
 
         render() {
-          this.updateCanvas();
+          if (!this.isInitialized) {
+            this.initCanvas();
+          } else {
+            this.updateCanvas();
+          }
+          // let testShape = new TestShape()
+          // testShape.testFunction('Woop');
+        }
+
+        updateCanvas() {
+          // console.log('updateCanvas');
+          this.layer.draw();
+        }
+
+        initCanvas() {
+          console.log("initCanvas")
+          this.layer.children.destroy();
+
+          this.ratio = this.calculateWindowRatio();
+
+          // Create base group and add it to stage.layer
+          this.baseGroup = this.createBaseGroup(this.ratio);
+          this.layer.add(this.baseGroup);
+    
+          // Corners
+          let cornerGroup = this.createCorners(this.ratio);
+          this.baseGroup.add(cornerGroup);
+
+          // railings
+          let frameGroup = this.createFrames(this.ratio);
+          this.baseGroup.add(frameGroup);
+
+          // planters
+          this.planterGroup = new Konva.Group();
+          this.baseGroup.add(this.planterGroup);
+
+          this.isinitialize = true;
+
+          this.layer.draw();
         }
 
         calculateWindowRatio() {
@@ -202,66 +359,36 @@
           return group;
         }
 
-        updateCanvas() {
-          console.log("updateCanvas")
-          this.layer.children.destroy();
-
-          let ratio = this.calculateWindowRatio();
-
-          // Create base group and add it to stage.layer
-          let baseGroup = this.createBaseGroup(ratio);
-          this.layer.add(baseGroup);
-    
-          // Corners
-          let cornerGroup = this.createCorners(ratio);
-          baseGroup.add(cornerGroup);
-
-          let frameGroup = this.createFrames(ratio);
-          baseGroup.add(frameGroup);
-
-          // // Top and bottom Frame
-          // var frameGroup = this.createLengthFrame(frameWidth, frameHeight);
-          // frameGroup.scale({ x: ratio, y: ratio });
-          // group.add(frameGroup);
-          
-          // // Left and right Frame
-          // frameGroup = this.createWidthFrame(frameWidth, frameHeight);
-          // frameGroup.scale({ x: ratio, y: ratio });
-          // group.add(frameGroup);
-
-          this.layer.draw();
-        }
-
         createCorners(ratio) {
 
-        // Create the corners
-        let topLeft = new Corner(0, 0, this.PAD);
-        let topRight = new Corner(this.balconyWidth-this.PAD, 0, this.PAD);
-        let bottomLeft = new Corner(0, this.balconyHeight-this.PAD, this.PAD);
-        let bottomRight = new Corner(this.balconyWidth-this.PAD, this.balconyHeight-this.PAD, this.PAD);
+          // Create the corners
+          let topLeft = new Corner(0, 0, this.PAD);
+          let topRight = new Corner(this.balconyWidth-this.PAD, 0, this.PAD);
+          let bottomLeft = new Corner(0, this.balconyHeight-this.PAD, this.PAD);
+          let bottomRight = new Corner(this.balconyWidth-this.PAD, this.balconyHeight-this.PAD, this.PAD);
 
-        this.corners.push(topLeft);
-        this.corners.push(topRight);
-        this.corners.push(bottomLeft);
-        this.corners.push(bottomRight);
+          this.corners.push(topLeft);
+          this.corners.push(topRight);
+          this.corners.push(bottomLeft);
+          this.corners.push(bottomRight);
 
-        let cornerGroup = new Konva.Group();
-        cornerGroup.add(topLeft, topRight, bottomLeft, bottomRight);
-        cornerGroup.scale({ x: ratio, y: ratio });
+          let cornerGroup = new Konva.Group();
+          cornerGroup.add(topLeft, topRight, bottomLeft, bottomRight);
+          cornerGroup.scale({ x: ratio, y: ratio });
 
-        return cornerGroup;
-      }
+          return cornerGroup;
+        }
 
         createFrames(ratio) {
 
-        let group = new Konva.Group();
+          let group = new Konva.Group();
 
-        group.add(this.createWidthFrames());
-        group.add(this.createHeightFrames());
-        group.scale({ x: ratio, y: ratio });
+          group.add(this.createWidthFrames());
+          group.add(this.createHeightFrames());
+          group.scale({ x: ratio, y: ratio });
 
-        return group;
-      }
+          return group;
+        }
 
         createWidthFrames() {
 
@@ -279,21 +406,15 @@
 
             let xOffset = this.PAD + (i*sectionLength);
 
+            let top = new Railing(this, xOffset, 0, sectionLength, this.PAD, 'top');
+            let bottom = new Railing(this, xOffset, this.balconyHeight-this.PAD, sectionLength, this.PAD, 'bottom');
 
-            let top = new Frame(xOffset, 0, sectionLength, this.PAD);
-            let bottom = new Frame(xOffset, this.balconyHeight-this.PAD, sectionLength, this.PAD);
+            this.railings.push(top);
+            this.railings.push(bottom);
 
-            this.frames.push(top);
-            this.frames.push(bottom);
-
-            group.add(top, bottom);
+            group.add(top.toShape(), bottom.toShape());
 
           }
-
-          group
-            .find('Line')
-            .stroke('black')
-            .strokeWidth(1);
 
           return group;
         }
@@ -313,18 +434,157 @@
             let yOffset = this.PAD + (i*sectionLength);
 
             // Left and Right section
-            let left = new Frame(0, yOffset, this.PAD, sectionLength);
-            let right = new Frame(this.balconyWidth-this.PAD, yOffset, this.PAD, sectionLength);
+            let left = new Railing(this, 0, yOffset, this.PAD, sectionLength, 'left');
+            let right = new Railing(this, this.balconyWidth-this.PAD, yOffset, this.PAD, sectionLength, 'right');
 
-            // Add to the frames array
-            this.frames.push(left);
-            this.frames.push(right);
+            // Add to the railings array
+            this.railings.push(left);
+            this.railings.push(right);
 
             // Add to group
-            group.add(left, right);
+            group.add(left.toShape(), right.toShape());
           }
 
           return group;
+        }
+
+        getRailingFromRailingShape(shape) {
+          this.railings.forEach(railing => {
+            if (railing.shape._id === shape._id) {
+              return railing;
+            }
+          })
+          console.log('getRailingFromRailingShape failed');
+        }
+
+        // getRailingFromPlanterShape(shape) {
+        //   // get the proper Planter shape
+        //   this.planters.forEach(planter => {
+        //     if () {
+
+        //     }
+        //   })
+        // }
+
+        eventMouseoverRailing(railingShape) {
+          console.log('eventMouseoverRailing');
+
+          let railing;
+
+          // display the respective Planter and Privacy
+          for (let i = 0; i < this.railings.length; i++) {
+            if (this.railings[i].shape._id === railingShape._id) {
+              console.log('its a match!');
+              railing = this.railings[i];
+            }
+          }
+
+          if (!railing.hasPlanter) {
+            let planter = new Planter(railing);
+            
+            this.planters[planter.railingId] = planter;
+            console.log(this.planters);
+
+            this.planterGroup.add(planter.toShape());
+            this.planterGroup.scale({ x: this.ratio, y: this.ratio });
+            this.baseGroup.add(this.planterGroup);
+
+            this.updateCanvas();
+          }
+          railing.hasPlanter = true;
+        }
+
+        eventMouseoffRailing(obj) {
+          console.log('eventMouseoffRailing');
+
+          setTimeout((obj) => {
+            console.log('setTimeout callback with obj: ', obj)
+
+            let planter = this.planters[obj._id];
+
+              if (planter && !planter.hover) {
+                console.log('removingPlanter');
+                this.removePlanter(obj);
+
+              }
+          }, 2000, obj);
+        }
+
+        // removePlanterFromFrame(railings)
+        removePlanter(railings) {
+          let planter = this.planters[railings.shape._id];
+              let railing;
+
+              if (planter.isSelected) {
+                return;
+              }
+
+              // Remove planter from this.planters
+              if (!this.planters[railings.shape._id].isSelected) {
+                delete this.planters[railings._id];
+              }
+              this.planterGroup.children.forEach(child => {
+                this.planterGroup.destroy(child);
+              });
+
+              // display the respective Planter and Privacy
+              for (let i = 0; i < this.railings.length; i++) {
+                if (this.railings[i].shape._id === railings._id) {
+                  console.log('its a match!');
+                  railing = this.railings[i];
+                }
+              }
+
+              railing.hasPlanter = false;
+              this.updateCanvas();
+        }
+
+        eventHoverPlanter(obj) {
+          console.log('eventHoverPlanter', obj);
+
+          // let planter = this.planters[obj._id];
+          // planter.hover = true;
+
+          if (this.planters[obj._id]) {
+            this.planters[obj._id].hover = true;
+          }
+        }
+
+        eventLeavePlanter(obj) {
+          // Remove this planter
+          // this.parent.destroy(this);
+
+          let railingId;
+          // get railingId from planter
+          for (let key in this.planters) {
+            if (this.planters[key].shape._id === obj._id) {
+              console.log('Ids match!:', this.planters[key].shape._id, obj._id);
+              railingId = this.planters[key].railingId;
+            }
+          }
+          // console.log('leavePlanter railingId: ', railingId);
+
+          // if (this.planters[railingId]) {
+          //   console.log('eventLeavePlanter: its a match');
+          //   this.planters[railingId].hover = false;
+          // }
+
+          let railing;
+          for (let i = 0; i < this.railings.length; i++) {
+            if (this.railings[i].shape._id === railingId) {
+              console.log('eventLeavePlanter: its a match!');
+              railing = this.railings[i];
+            }
+          }
+
+          this.removePlanter(railing);
+
+          obj.destroy();
+          this.updateCanvas();
+        }
+
+        eventSlectePlanter(obj) {
+          console.log(this.planters[obj._id]);
         }
 
       }
