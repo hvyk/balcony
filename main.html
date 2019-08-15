@@ -68,7 +68,7 @@
       // Draws the four corners of the rectangular balcony
       function createCorners(frameWidth, frameHeight) {
 
-        var PADDING = 70;   // width of frame
+        var PADDING = 70;   // width of railing
         var group = new Konva.Group();
 
         var topLeft = new Konva.Line({
@@ -132,11 +132,11 @@
 
 
       /**
-       * Create Frame
+       * Create railing
        */
       function createLengthFrame(frameWidth, frameHeight) {
 
-        var PADDING = 70;   // width of frame
+        var PADDING = 70;   // width of railing
         var group = new Konva.Group();
 
         var topDim = frameWidth - 2*PADDING;
@@ -207,11 +207,11 @@
 
 
       /**
-       * Create Frame
+       * Create railing
        */
       function createWidthFrame(frameWidth, frameHeight) {
 
-        var PADDING = 70;   // width of frame
+        var PADDING = 70;   // width of railing
         var group = new Konva.Group();
 
         var sideDim = frameHeight - 2*PADDING;
@@ -388,12 +388,12 @@
         frameGroup.scale({ x: ratio, y: ratio });
         group.add(frameGroup);
 
-        // Top and bottom Frame
+        // Top and bottom railing
         var frameGroup = createLengthFrame(frameWidth, frameHeight);
         frameGroup.scale({ x: ratio, y: ratio });
         group.add(frameGroup);
         
-        // Left and right Frame
+        // Left and right railing
         frameGroup = createWidthFrame(frameWidth, frameHeight);
         frameGroup.scale({ x: ratio, y: ratio });
         group.add(frameGroup);
