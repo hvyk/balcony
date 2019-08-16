@@ -210,13 +210,13 @@
       addEventListeners() {
         this.on('click', function () {
           console.log('Planter.click');
-          canvas.eventClickPrivacy(this);
+          canvas.eventClickPlanter(this);
         });
         this.on('mouseenter', function () {
-          canvas.eventMouseenterPrivacy(this);
+          canvas.eventMouseenterPlanter(this);
         });
         this.on('mouseleave', function () {
-          canvas.eventMouseleavePrivacy(this);
+          canvas.eventMouseleavePlanter(this);
         });
       }
     }
@@ -301,23 +301,10 @@
         this.baseGroup.add(cornerGroup);
 
         // railings
-        let frameGroup = this.createFrames();
-        this.baseGroup.add(frameGroup);
+        this.railingGroup = this.createFrames();
+        this.baseGroup.add(this.railingGroup);
 
-        // planters
-        this.planterGroup = new Konva.Group();
-        this.planterGroup.scale({x: this.ratio, y: this.ratio});
-        this.baseGroup.add(this.planterGroup);
-        // debug only
-        // this.createPlanters();
-
-        this.privacyGroup = new Konva.Group();
-        this.privacyGroup.scale({x: this.ratio, y: this.ratio});
-        this.baseGroup.add(this.privacyGroup);
-        // debug only
-        // this.createPrivacy();
-
-        this.isinitialize = true;
+        this.isinitialized = true;
 
         this.layer.draw();
       }
@@ -387,19 +374,21 @@
 
         let group = new Konva.Group();
 
-        group.add(this.createWidthFrames());
-        group.add(this.createHeightFrames());
+        // group.add(this.createWidthFrames());
+        // group.add(this.createHeightFrames());
+        group = this.createWidthFrames(group);
+        group = this.createHeightFrames(group);
         group.scale({ x: this.ratio, y: this.ratio });
 
         return group;
       }
 
-      createWidthFrames() {
+      createWidthFrames(group) {
 
         let frameWidth = this.balconyWidth;
         let frameHeight = this.balconyHeight;
 
-        var group = new Konva.Group();
+        // var group = new Konva.Group();
 
         var topDim = frameWidth - (2 * this.PAD);
         var numSections = Math.floor(topDim / PLANTER_LENGTH);
@@ -413,18 +402,24 @@
           let top = new Railing(this, xOffset, 0, sectionLength, this.PAD, 'top');
           let bottom = new Railing(this, xOffset, this.balconyHeight - this.PAD, sectionLength, this.PAD, 'bottom');
 
-          this.railings.push(top);
-          this.railings.push(bottom);
+          let topGroup = new Konva.Group();
+          let bottomGroup = new Konva.Group();
 
-          group.add(top, bottom);
+          topGroup.add(top);
+          bottomGroup.add(bottom);
+
+          // this.railings.push(top);
+          // this.railings.push(bottom);
+
+          group.add(topGroup, bottomGroup);
         }
 
         return group;
       }
 
-      createHeightFrames() {
+      createHeightFrames(group) {
 
-        var group = new Konva.Group();
+        // var group = new Konva.Group();
 
         // Some vars for easy calculations -  need numSections, and sectionLength
         var sideDim = this.balconyHeight - 2 * this.PAD;
@@ -440,34 +435,24 @@
           let left = new Railing(this, 0, yOffset, this.PAD, sectionLength, 'left');
           let right = new Railing(this, this.balconyWidth - this.PAD, yOffset, this.PAD, sectionLength, 'right');
 
-          // Add to the railings array
-          this.railings.push(left);
-          this.railings.push(right);
+          let leftGroup = new Konva.Group();
+          let rightGroup = new Konva.Group();
+
+          leftGroup.add(left);
+          rightGroup.add(right);
 
           // Add to group
-          group.add(left, right);
+          group.add(leftGroup, rightGroup);
         }
 
         return group;
       }
 
       eventMouseenterRailing(railing) {
-        // console.log('eventMouseenterRailing', railing);
+        console.log('eventMouseenterRailing', railing);
 
         if (!railing.hasPlanter) {
-
           this.addAllPlantersToTree(railing);
-          // // Planters
-          // let planter = new Planter(railing);
-          // this.planterGroup.add(planter);
-          // this.planters[railing._id] = planter;
-
-          // // Privacies
-          // let privacy = new Privacy(railing);
-          // this.privacyGroup.add(privacy);
-          // this.privacies[railing._id] = privacy;
-          // console.log('added privacy to privacies', privacy, this.privacies);
-
           this.updateCanvas();
         }
         railing.hasPlanter = true;
@@ -475,115 +460,136 @@
 
       addAllPlantersToTree(railing) {
         console.log('addAllPlantersToTree')
+        let railingGroup = railing.parent;
+          let planter = new Planter(railing);
+          let privacy = new Privacy(railing);
+          // this.planters[railing._id] = planter;
+
+          railingGroup.add(planter);
+          railingGroup.add(privacy);        
       }
 
       eventMouseleaveRailing(railing) {
 
           // Planter timeout
           this.planterTimeout = setTimeout((railing) => {
-            let planter = this.planters[railing._id];
-            if (planter === undefined) console.log('ERR: Planter not Defined');
+            console.log('MouseleftRailing');
 
-            if (!planter.hover) {
-              // console.log('removingPlanter');
-              this.removePlanter(railing);
-            }
+            // see if any of the railings children (planter, lattice) are hovered
+            let siblings = railing.parent.children;
+            siblings.forEach(sibling => {
+              if (!(sibling instanceof Railing) && !sibling.hover) {
+                sibling.destroy();
+              }
+            })
+            railing.hasPlanter = false;
+            this.updateCanvas();
           }, 200, railing);
 
-          // Privacy timeout
-          this.privacyTimeout = setTimeout((railing) => {
-            let privacy = this.privacies[railing._id];
-            if (privacy === undefined) console.log('ERR: Privacy not Defined', this.privacies)
-
-            if (!privacy.hover) {
-              this.removePrivacy(railing);
-            }
-          }, 200, railing);
       }
 
-      removePlanter(railing) {
-        let planter = this.planters[railing._id];
+      // removePlanter(railing) {
+      //   let planter = this.planters[railing._id];
 
-        if (planter.isSelected) {
-          return;
-        }
+      //   if (planter.isSelected) {
+      //     return;
+      //   }
 
-        // Remove planter from this.planters
-        if (!planter.isSelected) {
-          planter.destroy();
-          delete this.planters[railing._id];
-        }
+      //   // Remove planter from this.planters
+      //   if (!planter.isSelected) {
+      //     planter.destroy();
+      //     delete this.planters[railing._id];
+      //   }
 
-        railing.hasPlanter = false;
-        this.updateCanvas();
-      }
+      //   railing.hasPlanter = false;
+      //   this.updateCanvas();
+      // }
 
-      removePrivacy(railing) {
-        if (railing === undefined) console.log('removePrivacy ERR: railing undefined');
-        let privacy = this.privacies[railing._id];
-        if (privacy === undefined) console.log('ERR: Privacy not Defined', this.privacies)
-
-
-        if (privacy.isSelected) {
-          return;
-        }
-
-        // Remove privacy from this.planters
-        console.log(this.privacies);
-        throw new Error('deleting privacy from privacies', this.privacies);
-        privacy.destroy();
-        delete this.privacies[railing._id];
-        console.log('deleting privacy from privacies', this.privacies);
+      // removePrivacy(railing) {
+      //   if (railing === undefined) console.log('removePrivacy ERR: railing undefined');
+      //   let privacy = this.privacies[railing._id];
+      //   if (privacy === undefined) console.log('ERR: Privacy not Defined', this.privacies)
 
 
-        railing.hasPlanter = false;
-        this.updateCanvas();
-      }
+      //   if (privacy.isSelected) {
+      //     return;
+      //   }
+
+      //   // Remove privacy from this.planters
+      //   console.log(this.privacies);
+      //   throw new Error('deleting privacy from privacies', this.privacies);
+      //   privacy.destroy();
+      //   delete this.privacies[railing._id];
+      //   console.log('deleting privacy from privacies', this.privacies);
+
+
+      //   railing.hasPlanter = false;
+      //   this.updateCanvas();
+      // }
 
       eventMouseenterPlanter(planter) {
-        // console.log('eventHoverPlanter', planter);
-        clearTimeout(this.planterTimeout);
-
+        console.log('eventMouseenverPlanter', planter);
+        // clearTimeout(this.planterTimeout);
         planter.hover = true;
       }
 
       getRailingFromPlanter(planter) {
-        let railingId;
-        for (let key in this.planters) {
-          if (this.planters[key] === planter) {
-            railingId = parseInt(key);
+
+        let siblings = planter.parent.children;
+        // siblings.forEach(sibling => {
+
+        for (let i = 0; i < siblings.length; i++) {
+          let sibling = siblings[i];
+          if (sibling instanceof Railing) {
+            return sibling;
           }
         }
-        if (railingId === undefined) {
-          console.log('getRailingFromPlanter ERR: No railingId found')
-        }
-        for (let i = 0; i < this.railings.length; i++) {
-          let railing = this.railings[i];
-          if (railing._id === railingId) {
-            return railing;
-          }
-        }
-        // console.log('getRailingFromPlanter ERR: No railing found')
-        return;
+        // });
+        return null;
+        
+        // let railingId = planter.railingId;
+
+        // for (let i = 0; i < this.railings.length; i++) {
+        //   let railing = this.railings[i];
+        //   if (railing._id === railingId) {
+        //     return railing;
+        //   }
+        // }
+        // // console.log('getRailingFromPlanter ERR: No railing found')
+        // return;
       }
 
       eventMouseleavePlanter(planter) {
-        // console.log('eventLeavePlanter', planter);
+        console.log('eventMouseLeavePlanter', planter);
 
-        let children = this.planterGroup.children;
-        let planterInGroup = false;
-        // check if this planter is even still in the Konva tree
-        for (let i = 0; i < children.length; i++) {
-          if (children[i] === planter) {
-            planterInGroup = true;
-            // console.log('Planter in Group');
-          }
+        this.hover = false;
+
+        if (!planter.isSelected) {
+          // remove the planter
+          let siblings = planter.parent.children;
+            siblings.forEach(sibling => {
+              if (!(sibling instanceof Railing) && sibling.hover) {
+                sibling.destroy();
+              }
+            })
+            this.updateCanvas();
+
         }
-        if (!planterInGroup) return;
 
-        planter.hover = false;
-        let railing = this.getRailingFromPlanter(planter);
-        this.removePlanter(railing);
+        // let children = this.planterGroup.children;
+        // let planterInGroup = false;
+        // // check if this planter is even still in the Konva tree
+        // for (let i = 0; i < children.length; i++) {
+        //   if (children[i] === planter) {
+        //     planterInGroup = true;
+        //     // console.log('Planter in Group');
+        //   }
+        // }
+        // if (!planterInGroup) return;
+
+        // planter.hover = false;
+        // let railing = this.getRailingFromPlanter(planter);
+        // this.removePlanter(railing);
       }
 
 
@@ -592,11 +598,35 @@
 
         planter.isSelected = !planter.isSelected;
         planter.hover = false;
-        let railing = this.getRailingFromPlanter(planter);
 
-        this.removePlanter(railing);
+        if (!planter.isSelected) {
+          let railing = this.getRailingFromPlanter(planter);
+          // remove the planter
+          let siblings = railing.parent.children;
+            siblings.forEach(sibling => {
+              if (!(sibling instanceof Railing) && !sibling.hover) {
+                sibling.destroy();
+              }
+            })
+            this.updateCanvas();
+
+        }
+
+
+        // this.removeUnselectedPlanters(railing);
       }
 
+
+      removeUnselectedPlanters(planter) {
+        console.log('removeUnselectedPlanters');
+        let siblings = planter.parent.children;
+
+        siblings.forEach(sibling => {
+          if (!sibling.isSelected) {
+            console.log(sibling.destroy());
+          }
+        })
+      }
 
       /**
        *
@@ -604,61 +634,61 @@
        */
 
 
-      eventMouseenterPrivacy(privacy) {
-        // console.log('eventHoverPlanter', planter);
-        clearTimeout(this.privacyTimeout);
+      // eventMouseenterPrivacy(privacy) {
+      //   // console.log('eventHoverPlanter', planter);
+      //   clearTimeout(this.privacyTimeout);
 
-        privacy.hover = true;
-      }
+      //   privacy.hover = true;
+      // }
 
-      getRailingFromPrivacy(privacy) {
-        let railingId;
-        for (let key in this.privacies) {
-          if (this.privacies[key] === privacy) {
-            railingId = parseInt(key);
-          }
-        }
-        if (railingId === undefined) {
-          console.log('getRailingFromprivacy ERR: No railingId found')
-        }
-        for (let i = 0; i < this.railings.length; i++) {
-          let railing = this.railings[i];
-          if (railing._id === railingId) {
-            return railing;
-          }
-        }
-        // console.log('getRailingFromprivacy ERR: No railing found')
-        return;
-      }
+      // getRailingFromPrivacy(privacy) {
+      //   let railingId;
+      //   for (let key in this.privacies) {
+      //     if (this.privacies[key] === privacy) {
+      //       railingId = parseInt(key);
+      //     }
+      //   }
+      //   if (railingId === undefined) {
+      //     console.log('getRailingFromprivacy ERR: No railingId found')
+      //   }
+      //   for (let i = 0; i < this.railings.length; i++) {
+      //     let railing = this.railings[i];
+      //     if (railing._id === railingId) {
+      //       return railing;
+      //     }
+      //   }
+      //   // console.log('getRailingFromprivacy ERR: No railing found')
+      //   return;
+      // }
 
-      eventMouseleavePrivacy(privacy) {
-        console.log('eventLeaveprivacy', privacy);
+      // eventMouseleavePrivacy(privacy) {
+      //   console.log('eventLeaveprivacy', privacy);
 
-        let children = this.privacyGroup.children;
-        let privacyInGroup = false;
-        // check if this privacy is even still in the Konva tree
-        for (let i = 0; i < children.length; i++) {
-          if (children[i] === privacy) {
-            privacyInGroup = true;
-            // console.log('privacy in Group');
-          }
-        }
-        if (!privacyInGroup) return;
+      //   let children = this.privacyGroup.children;
+      //   let privacyInGroup = false;
+      //   // check if this privacy is even still in the Konva tree
+      //   for (let i = 0; i < children.length; i++) {
+      //     if (children[i] === privacy) {
+      //       privacyInGroup = true;
+      //       // console.log('privacy in Group');
+      //     }
+      //   }
+      //   if (!privacyInGroup) return;
 
-        privacy.hover = false;
-        let railing = this.getRailingFromPrivacy(privacy);
-        this.removePrivacy(railing);
-      }
+      //   privacy.hover = false;
+      //   let railing = this.getRailingFromPrivacy(privacy);
+      //   this.removePrivacy(railing);
+      // }
 
-      eventClickPrivacy(privacy) {
-        console.log('eventClickprivacy', privacy);
+      // eventClickPrivacy(privacy) {
+      //   console.log('eventClickprivacy', privacy);
 
-        privacy.isSelected = !privacy.isSelected;
-        privacy.hover = false;
-        let railing = this.getRailingFromPrivacy(privacy);
+      //   privacy.isSelected = !privacy.isSelected;
+      //   privacy.hover = false;
+      //   let railing = this.getRailingFromPrivacy(privacy);
 
-        this.removePrivacy(railing);
-      }
+      //   this.removePrivacy(railing);
+      // }
 
     }
 
