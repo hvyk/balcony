@@ -3,424 +3,199 @@
   <head>
     <script src="https://unpkg.com/konva@4.0.3/konva.min.js"></script>
     <meta charset="utf-8" />
-    <title>Konva Simple Window drawing</title>
-    <style>
-      body {
-        PADDING: 0;
-        margin: 0;
-        overflow: hidden;
-      }
 
-      #container {
-        /* border: 1px solid grey; */
-        /* background-color: lightgrey; */
-        background-color: #fff;
-      }
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+    crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
 
-      #controls {
-        position: absolute;
-        top: 4px;
-        left: 4px;
-      }
-    </style>
+  <title>Balcony Home</title>
   </head>
 
   <body>
-    <div id="container"></div>
 
-    <div id="controls">
-      <div style="float: left; PADDING: 10px">
-        Length:
-        <input type="number" id="widthInput" />
+    <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a href="/main.html" class="navbar-brand text-white"><i class="fa fa-leaf text-success" aria-hidden="true"></i> Balcony</a>
+        <div>
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a href="#" class="nav-link">Design</a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">Learning</a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">About</a>
+            </li>
+          </ul>
+        </div>
       </div>
-      <div style="float: left; PADDING: 10px">
-        Width:
-        <input type="number" id="heightInput" />
+    </nav>
+
+    <!-- HOME SECTION -->
+    <header id="home-section">
+      <div class="dark-overlay">
+        <div class="home-inner container">
+          <div class="row">
+            <div class="col-lg-8 d-none d-lg-block">
+              <h1 class="text-white display-4">Build your dream apartment garden</h1>
+              <div class="d-flex">
+                <div class="p-4 align-self-start">
+                  <i class="fas fa-check fa-2x"></i>
+                </div>
+                <div class="p-4 align-self-end text-white">
+                  <h4>Design in under 5 minutes</h4>
+                </div>
+              </div>
+  
+              <div class="d-flex">
+                <div class="p-4 align-self-start">
+                  <i class="fas fa-check fa-2x"></i>
+                </div>
+                <div class="p-4 align-self-end text-white">
+                  <h4>Delivered right to your door</h4>
+                </div>
+              </div>
+  
+              <div class="d-flex">
+                <div class="p-4 align-self-start">
+                  <i class="fas fa-check fa-2x"></i>
+                </div>
+                <div class="p-4 align-self-end text-white">
+                  <h4>Easy to care for and keep your plants alive</h4>
+                </div>
+              </div>
+            </div>
+  
+            <div class="col-lg-4">
+              <div class="card bg-white text-center card-form">
+                <div class="card-body">
+                  <h3>Start your design now</h3>
+                  <p>What are the dimensions of your balcony?</p>
+                  <form id="balcony-dims">
+                    <div class="form-group">
+                      <input type="text" id="balcony-width" class="form-control form-control-lg" placeholder="Width (metres)">
+                    </div>
+                    <div class="form-group">
+                      <input type="text" id="balcony-length" class="form-control form-control-lg" placeholder="Length (metres)">
+                    </div>
+                    <input type="submit" value="Submit" class="btn btn-outline-dark btn-block">
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </header>
+
+      <!-- EXPLORE HEAD -->
+    <section id="explore-head-section">
+      <div class="container">
+        <div class="row">
+          <div class="col text-center py-5">
+            <h1 class="display-4">Explore and Learn</h1>
+            <p class="lead">Learn just how simple it is to keep your plants alive</p>
+            <a href="#" class="btn btn-outline-secondary">Flowers</a>
+            <a href="#" class="btn btn-outline-secondary">Herbs and Edibles</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+      <!-- EXPLORE SECTION -->
+    <section id="explore-section" class="bg-light text-muted py-5">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <img id="explore-flowers" src="img/three-herbs.jpg" alt="" class="img-fluid mb-3 rounded-circle">
+          </div>
+          <div class="col-md-6">
+            <h3>Explore and LEarn</h3>
+            <p>Keep your plants alive and let them thrive</p>
+            <div class="d-flex">
+              <div class="p-4 align-self-start">
+                <i class="fas fa-check fa-2x"></i>
+              </div>
+              <div class="p-4 align-self-end">
+                Flowers
+              </div>
+            </div>
+  
+            <div class="d-flex">
+              <div class="p-4 align-self-start">
+                <i class="fas fa-check fa-2x"></i>
+              </div>
+              <div class="p-4 align-self-end">
+                Herbs and Edibles
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+      <!-- INSPIRE SECTION -->
+    <section id="inspire-section" class="py-5">
+      <div class="container">
+        <div class="row">
+          <!-- <div class="col-md-6 order-1"> -->
+          <div>
+            <h3>Here's some Inspiration</h3>
+            <img src="img/inspo-1.jpg" class="inspo">
+            <img src="img/inspo-2.jpg" class="inspo">
+            <img src="img/inspo-3.jpg" class="inspo">
+            <img src="img/inspo-4.jpg" class="inspo">
+            <img src="img/inspo-5.jpg" class="inspo">
+            <img src="img/inspo-6.jpg" class="inspo">
+            <img src="img/inspo-7.jpg" class="inspo">
+            <img src="img/inspo-8.jpg" class="inspo">
+            <img src="img/inspo-9.jpg" class="inspo">
+            <img src="img/inspo-10.jpg"class="inspo">
+            <img src="img/inspo-11.jpg"class="inspo">
+            <img src="img/inspo-12.jpg"class="inspo">
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+      <!-- FOOTER -->
+    <footer id="main-footer" class="bg-white">
+      <div class="container">
+        <div class="row">
+          <div class="col text-center py-4">
+            <h3>Balcony</h3>
+            <p>Copyright &copy;
+              <span id="year"></span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
     <script>
 
-      // Constants
-      const SCALE_FACTOR = 0.65;
-      const PADDING = 70; // mm
+      function startDesign(e) {
 
-      // planter dimensions
-      var PLANTER_WIDTH = 300;
-      var PLANTER_LENGTH = 800;
+        let width = document.getElementById('balcony-width').value * 1000;
+        let length = document.getElementById('balcony-length').value * 1000;
 
+        let newUrl = `design.html?width=${length}&length=${width}`;
+        console.log(`Moving to ${newUrl}`);
 
-      var width = window.innerWidth;
-      var height = window.innerHeight;
+        window.location.href = newUrl;
 
-      var stage = new Konva.Stage({
-        container: 'container',
-        width: width,
-        height: height
-      });
-
-      var layer = new Konva.Layer();
-      stage.add(layer);
-
-      var widthInput = document.getElementById('widthInput');
-      var heightInput = document.getElementById('heightInput');
-
-
-      // Draws the four corners of the rectangular balcony
-      function createCorners(frameWidth, frameHeight) {
-
-        var PADDING = 70;   // width of railing
-        var group = new Konva.Group();
-
-        var topLeft = new Konva.Line({
-          points: [
-            0,       0,
-            PADDING, 0,
-            PADDING, PADDING,
-            0,       0,
-            0,       PADDING,
-            PADDING, PADDING,
-          ],
-          fill: 'white'
-        });
-
-        var topRight = new Konva.Line({
-          points: [
-            frameWidth, 0,
-            frameWidth-PADDING, 0,
-            frameWidth-PADDING, PADDING,
-            frameWidth, 0,
-            frameWidth, PADDING,
-            frameWidth-PADDING, PADDING,
-          ],
-          fill: 'white'
-        });
-
-        var bottomRight = new Konva.Line({
-          points: [
-            frameWidth,         frameHeight,
-            frameWidth-PADDING, frameHeight,
-            frameWidth-PADDING, frameHeight-PADDING,
-            frameWidth,         frameHeight,
-            frameWidth,         frameHeight-PADDING,
-            frameWidth-PADDING, frameHeight-PADDING,
-          ],
-          fill: 'white'
-        });
-
-        var bottomLeft = new Konva.Line({
-          points: [
-            0,       frameHeight,
-            PADDING, frameHeight,
-            PADDING, frameHeight-PADDING,
-            0,       frameHeight,
-            0,       frameHeight-PADDING,
-            PADDING, frameHeight-PADDING,
-          ],
-          fill: 'white'
-        });
-
-        group.add(topLeft, topRight, bottomRight, bottomLeft);
-
-        group
-          .find('Line')
-          // .closed(true)
-          .stroke('black')
-          .strokeWidth(1);
-
-        return group;
+        e.preventDefault();
       }
 
+      const dims = document.getElementById('balcony-dims');
 
-      /**
-       * Create railing
-       */
-      function createLengthFrame(frameWidth, frameHeight) {
-
-        var PADDING = 70;   // width of railing
-        var group = new Konva.Group();
-
-        var topDim = frameWidth - 2*PADDING;
-        var numSections = Math.floor(topDim / PLANTER_LENGTH);
-        var remainder = topDim % (numSections * PLANTER_LENGTH )
-        var sectionLength = remainder / numSections + PLANTER_LENGTH;
-
-        for (let i = 0; i < numSections; i++) {
-          console.log('draw section ', i)
-
-          let xOffset = PADDING + (i*sectionLength);
-          // draw the top section
-          var topSection = new Konva.Line({
-            points: [
-              xOffset, 0,
-              xOffset + sectionLength, 0,
-              xOffset + sectionLength, PADDING,
-              xOffset, PADDING,
-              xOffset, 0,
-            ],
-            fill: 'white'
-          });
-
-          var topSectionFill = new Konva.Rect({
-            x: xOffset,
-            y: 0,
-            width: sectionLength,
-            height: PADDING,
-            fill: '#EAEAEA'
-          });
-          topSectionFill.on('mouseover', function() {
-            console.log(`top Section ${i} Mouseover`);
-          });
-
-          var bottomSection = new Konva.Line({
-            points: [
-              xOffset, frameHeight-PADDING,
-              xOffset + sectionLength, frameHeight-PADDING,
-              xOffset + sectionLength, frameHeight,
-              xOffset, frameHeight,
-              xOffset, frameHeight-PADDING,
-            ],
-            fill: 'white'
-          });
-
-          var bottomSectionFill = new Konva.Rect({
-            x: xOffset,
-            y: frameHeight-PADDING,
-            width: sectionLength,
-            height: PADDING,
-            fill: '#EAEAEA'
-          });
-          bottomSectionFill.on('mouseover', function() {
-            console.log(`top Section ${i} Mouseover`);
-          });
-
-          group.add(topSection, topSectionFill, bottomSection, bottomSectionFill);
-
-        }
-
-        group
-          .find('Line')
-          .stroke('black')
-          .strokeWidth(1);
-
-        return group;
-      }
-
-
-      /**
-       * Create railing
-       */
-      function createWidthFrame(frameWidth, frameHeight) {
-
-        var PADDING = 70;   // width of railing
-        var group = new Konva.Group();
-
-        var sideDim = frameHeight - 2*PADDING;
-        var numSections = Math.floor(sideDim / PLANTER_LENGTH);
-        var remainder = sideDim % (numSections * PLANTER_LENGTH )
-        var sectionLength = remainder / numSections + PLANTER_LENGTH;
-
-        for (let i = 0; i < numSections; i++) {
-
-          let yOffset = PADDING + (i*sectionLength);
-
-          // draw the left section and fill it
-          var leftSection = new Konva.Line({
-            points: [
-              0,           yOffset,
-              0 + PADDING, yOffset,
-              0 + PADDING, yOffset + sectionLength,
-              0, yOffset + sectionLength,
-              0, 0,
-            ],
-            fill: 'white'
-          });
-
-          var leftSectionFill = new Konva.Rect({
-            x: 0,
-            y: yOffset,
-            width: PADDING,
-            height: sectionLength,
-            fill: '#EAEAEA'
-          });         
-          leftSectionFill.on('mouseover', function() {
-            console.log(`left Section ${i} Mouseover`);
-          });
-
-          // draw the left section and fill it
-          var rightSection = new Konva.Line({
-            points: [
-              frameWidth-PADDING,           yOffset,
-              frameWidth-PADDING + PADDING, yOffset,
-              frameWidth-PADDING + PADDING, yOffset + sectionLength,
-              frameWidth-PADDING, yOffset + sectionLength,
-              frameWidth-PADDING, 0,
-            ],
-            fill: 'white'
-          });
-
-          var rightSectionFill = new Konva.Rect({
-            x: frameWidth-PADDING,
-            y: yOffset,
-            width: PADDING,
-            height: sectionLength,
-            fill: '#EAEAEA'
-          });
-          rightSectionFill.on('mouseover', function() {
-            console.log(`right Section ${i} Mouseover`);
-          });
-
-          group.add(leftSection, leftSectionFill, rightSection, rightSectionFill);
-        }
-
-        group
-          .find('Line')
-          // .closed(true)
-          .stroke('black')
-          .strokeWidth(1);
-
-        return group;
-      }
-
-      /**
-       * Draw all the planters
-       *
-       */
-      function createPlanter() {
-
-        var group = new Konva.Group();
-
-        var rect1 = new Konva.Rect({
-          x: 50,
-          y: 200,
-          width: 200,
-          height: 50,
-          fill: '#97FA83',
-          stroke: 'black',
-          strokeWidth: 2
-        });
-        // add the shape to the layer
-        layer.add(rect1);
-
-        group.add(rect1);
-
-        group
-          .find('Line')
-          // .closed(true)
-          // .stroke('black')
-          // .strokeWidth(4);
-
-        return group;
-
-      }
-
-      function createInput(metric, pos, size) {
-        var wrap = document.createElement('div');
-        wrap.style.position = 'absolute';
-        wrap.style.backgroundColor = 'rgba(0,0,0,0.1)';
-        wrap.style.top = 0;
-        wrap.style.left = 0;
-        wrap.style.width = '100%';
-        wrap.style.height = '100%';
-
-        document.body.appendChild(wrap);
-
-        var input = document.createElement('input');
-        input.type = 'number';
-
-        var similarInput = metric === 'width' ? widthInput : heightInput;
-        input.value = similarInput.value;
-
-        input.style.position = 'absolute';
-        input.style.top = pos.y + 3 + 'px';
-        input.style.left = pos.x + 'px';
-
-        input.style.height = size.height + 3 + 'px';
-        input.style.width = size.width + 3 + 'px';
-
-        wrap.appendChild(input);
-
-        input.addEventListener('change', function() {
-          similarInput.value = input.value;
-          updateCanvas();
-        });
-
-        input.addEventListener('input', function() {
-          similarInput.value = input.value;
-          updateCanvas();
-        });
-
-        wrap.addEventListener('click', function(e) {
-          if (e.target === wrap) {
-            document.body.removeChild(wrap);
-          }
-        });
-
-        input.addEventListener('keyup', function(e) {
-          if (e.keyCode === 13) {
-            document.body.removeChild(wrap);
-          }
-        });
-      }
-
-      function updateCanvas() {
-        layer.children.destroy();
-
-        var frameWidth = parseInt(widthInput.value, 10);
-        var frameHeight = parseInt(heightInput.value, 10);
-
-        var wr = stage.width() / frameWidth;
-        var hr = stage.height() / frameHeight;
-
-        var ratio = Math.min(wr, hr) * SCALE_FACTOR;
-
-        var frameOnScreenWidth = frameWidth * ratio;
-        var frameOnScreenHeight = frameHeight * ratio;
-
-        var group = new Konva.Group({});
-
-        group.x(Math.round(stage.width() / 2 - frameOnScreenWidth / 2) + 0.5);
-        group.y(Math.round(stage.height() / 2 - frameOnScreenHeight / 2) + 0.5);
-
-        layer.add(group);
-  
-        // Corners
-        frameGroup = createCorners(frameWidth, frameHeight);
-        frameGroup.scale({ x: ratio, y: ratio });
-        group.add(frameGroup);
-
-        // Top and bottom railing
-        var frameGroup = createLengthFrame(frameWidth, frameHeight);
-        frameGroup.scale({ x: ratio, y: ratio });
-        group.add(frameGroup);
-        
-        // Left and right railing
-        frameGroup = createWidthFrame(frameWidth, frameHeight);
-        frameGroup.scale({ x: ratio, y: ratio });
-        group.add(frameGroup);
-
-
-
-        // var planterGroup = createPlanter();
-        // planterGroup.scale({ x: ratio, y: ratio });
-        // group.add(planterGroup);
-
-        // var infoGroup = createInfo(frameOnScreenWidth, frameOnScreenHeight);
-        // group.add(infoGroup);
-
-        layer.draw();
-      }
-
-      widthInput.addEventListener('change', updateCanvas);
-      widthInput.addEventListener('input', updateCanvas);
-
-      heightInput.addEventListener('change', updateCanvas);
-      heightInput.addEventListener('input', updateCanvas);
-
-      // set default value
-      widthInput.value = 2000;
-      heightInput.value = 1000;
-
-      updateCanvas();
+      dims.addEventListener('submit', startDesign);
     </script>
   </body>
 </html>
