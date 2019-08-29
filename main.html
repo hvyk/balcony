@@ -193,6 +193,8 @@
         e.preventDefault();
       }
 
+      localStorage.removeItem('shoppingCart');
+
       const dims = document.getElementById('balcony-dims');
 
       dims.addEventListener('submit', startDesign);

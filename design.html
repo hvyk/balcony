@@ -6,9 +6,11 @@
   <meta charset="utf-8" />
 
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp"
+  crossorigin="anonymous">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+  crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
 
   <title>Balcony Designer</title>
 </head>
@@ -36,16 +38,9 @@
 
   <div id="container"></div>
 
-  <!-- <div id="controls">
-    <div style="float: left; PADDING: 10px">
-      Length:
-      <input type="number" id="widthInput" />
-    </div>
-    <div style="float: left; PADDING: 10px">
-      Width:
-      <input type="number" id="heightInput" />
-    </div>
-  </div> -->
+  <div id="submit-design">
+    <input id="submit-design-btn" type="submit" value="Submit" class="btn btn-outline-dark">
+  </div>
   <script>
 
     // Constants
@@ -301,7 +296,7 @@
           canvas.eventMouseenterPlanter(this);
         })
         this.on('mouseleave', function () {
-          canvas.eventMouseleavePlanter(this);
+          canvas.eventMouseleaveCornerPlanter(this);
         })
       }
     }
@@ -335,12 +330,14 @@
         this.stage = new Konva.Stage({
           container: 'container',
           width: this.windowWidth,
-          height: this.windowHeight
+          height: this.windowHeight - 60
         });
 
         // Create the layer, and add it to the stage
         this.layer = new Konva.Layer();
         this.stage.add(this.layer);
+
+        this.planters = {};
 
         this.isInitialized = false;
       }
@@ -691,6 +688,41 @@
         }
       }
 
+      eventMouseleaveCornerPlanter(planter) {
+        console.log('eventMouseLeavePlanter', planter);
+
+        if (!planter) return;
+
+        // to prevent planter being null after a planter deselection
+        let cornerGroup = (this.lastCornerGroup || planter.parent);
+
+        if (this.planterDebounce === true) {
+          this.planterDebounce = false;
+        }
+
+        planter.hover = false;
+
+        // Can't keep a handle on objects if we keep destroying them..
+        if (!planter.isSelected) {
+          let siblings = cornerGroup.children;
+
+          // remove the planter
+          for (let i = siblings.length - 1; i >= 0; i--) {
+            let sibling = siblings[i];
+            if (!(sibling instanceof Corner) && !sibling.hover) {
+              sibling.destroy();
+            }
+          }
+
+          if (cornerGroup.children.length === 1) {
+            let corner = cornerGroup.children[0];
+            corner.hasPlanter = false;
+          }
+
+          this.updateCanvas();
+        }
+      }
+
       eventClickPlanter(planter) {
         console.log('eventSelectPlanter', planter);
 
@@ -699,6 +731,13 @@
         this.planterDebounce = true;
 
         planter.isSelected = !planter.isSelected;
+
+        if (planter.isSelected) {
+          this.planters[planter._id] = planter;
+        } else {
+          delete this.planters[planter._id];
+        }
+
         planter.hover = false;
 
         if (!planter.isSelected) {
@@ -734,6 +773,13 @@
         this.cornerPlanterDebounce = true;
 
         planter.isSelected = !planter.isSelected;
+
+        if (planter.isSelected) {
+          this.planters[planter._id] = planter;
+        } else {
+          delete this.planters[planter._id];
+        }
+
         planter.hover = false;
 
         if (!planter.isSelected) {
@@ -762,6 +808,35 @@
 
     }
 
+    function submitDesign(e) {
+
+      console.log('Submitting Desing');
+
+      let storageContent = {};
+
+      for (key in canvas.planters) {
+        let planter = canvas.planters[key];
+        if (planter instanceof RailingPlanter) {
+          storageContent['RailingPlanter'] = storageContent['RailingPlanter']+1 || 1;
+        } else if (planter instanceof Privacy) {
+          storageContent['Privacy'] = storageContent['Privacy']+1 || 1;
+        } else if (planter instanceof CornerPlanter) {
+          storageContent['CornerPlanter'] = storageContent['CornerPlanter']+1 || 1;
+        }
+      }
+
+      localStorage.setItem('shoppingCart', JSON.stringify(storageContent));
+
+      window.location.href="checkout.html";
+
+      e.preventDefault();
+    }
+
+    let submitBtn = document.getElementById('submit-design-btn');
+    submitBtn.addEventListener('click', submitDesign);
+
+
+    localStorage.removeItem('shoppingCart');
 
     let canvas = new Canvas();
     canvas.render();
