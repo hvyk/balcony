@@ -36,8 +36,10 @@
     </nav>
 
     <div id="checkout-page-content" class="container">
+      <h1>Checkout</h1>
       <div id="items-table" class="row">
       </div>
+      <input id="submit-order-btn" type="submit" value="Place Order" class="btn btn-outline-dark">
     </div>
 
 
@@ -98,6 +100,20 @@
         //the event occurred
         populateCheckout();
       })
+
+      function submitOrder(e) {
+        let items = document.getElementById('checkout-page-content');
+        items.innerHTML = '';
+
+        console.log('Submitting order')
+
+        let output = `<h1>Thank you for submitting your order.  Click <a href="main.html">Here</a> to return home</h1>`
+        items.innerHTML = output;
+        e.preventDefault();
+      }
+
+      let submitBtn = document.getElementById('submit-order-btn');
+      submitBtn.addEventListener('click', submitOrder);
 
 
     </script>
